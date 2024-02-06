@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 import datetime
 from flask_marshmallow import Marshmallow
+from sqlalchemy import and_
 
 app = Flask(__name__)
 
@@ -31,7 +32,7 @@ class ArticleSchema(ma.Schema):
 
 
 article_schema = ArticleSchema()
-article_schema = ArticleSchema(many=True)
+# article_schema = ArticleSchema(many=True)
 
 
 @app.route('/get', methods=['GET'])
@@ -44,14 +45,10 @@ def add_articles():
     body = request.json['body']
 
     articles = Articles(title, body)
-    # db.session.add(articles)
-    # db.session.commit()
+    db.session.add(articles)
+    db.session.commit()
 
-    return article_schema.jsonify({
-        "id": 123,
-        "title": "ssss",
-        "body": "12414"
-    })
+    return article_schema.dump(articles)
 
 if __name__ == "__main__":
     app.run(debug=True)
