@@ -44,12 +44,14 @@ def add_articles():
     body = request.json['body']
 
     articles = Articles(title, body)
-    db.session.add(articles)
-    db.session.commit()
+    # db.session.add(articles)
+    # db.session.commit()
 
-    # Serialize the Articles object using the ArticleSchema
-    # result = article_schema.dump(articles)
-    return article_schema.jsonify(articles)
+    return article_schema.jsonify({
+        "id": 123,
+        "title": "ssss",
+        "body": "12414"
+    })
 
 if __name__ == "__main__":
     app.run(debug=True)
