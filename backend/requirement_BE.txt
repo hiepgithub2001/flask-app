@@ -4,3 +4,5 @@ mysqlclient
 flask-marshmallow
 marshmallow-sqlalchemy
 Flask-Cors
+python-dotenv
+marshmallow
