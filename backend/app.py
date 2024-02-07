@@ -39,7 +39,14 @@ article_schema = ArticleSchema()
 
 @app.route('/get', methods=['GET'])
 def get_articles():
-    return jsonify({"Hello": "hitran"})
+    records = Articles.query.all()
+    articles = [dict(
+        id=item.id,
+        title=item.title,
+        body=item.body,
+        date=item.date
+    ) for item in records]
+    return jsonify(articles)
 
 @app.route('/add', methods=['POST'])
 def add_articles():
