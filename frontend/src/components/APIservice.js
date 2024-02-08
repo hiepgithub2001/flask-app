@@ -5,7 +5,7 @@ export default class APIservice {
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include'
+      credentials: 'include',
     });
     return await resp.json();
   }
@@ -17,7 +17,7 @@ export default class APIservice {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
-      credentials: 'include'
+      credentials: 'include',
     });
     return await resp.json();
   }
@@ -29,7 +29,7 @@ export default class APIservice {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
-      credentials: 'include'
+      credentials: 'include',
     });
     return await resp.json();
   }
@@ -41,7 +41,7 @@ export default class APIservice {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
-      credentials: 'include'
+      credentials: 'include',
     });
     return await resp.json();
   }
@@ -53,7 +53,7 @@ export default class APIservice {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
-      credentials: 'include'
+      credentials: 'include',
     });
     return await resp.json();
   }
@@ -65,7 +65,7 @@ export default class APIservice {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
-      credentials: 'include'
+      credentials: 'include',
     });
     return await resp.json();
   }
@@ -73,7 +73,7 @@ export default class APIservice {
   static async GetCurrentUser() {
     const resp = await fetch(`http://127.0.0.1:5000/@me`, {
       method: 'GET',
-      credentials: 'include'
+      credentials: 'include',
     });
     return await resp.json();
   }
@@ -81,7 +81,7 @@ export default class APIservice {
   static async Logout() {
     const resp = await fetch(`http://127.0.0.1:5000/logout`, {
       method: 'POST',
-      credentials: 'include'
+      credentials: 'include',
     });
     return await resp.json();
   }

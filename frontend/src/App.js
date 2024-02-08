@@ -1,11 +1,11 @@
-import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import LandingPage from "./components/pages/LandingPage";
-import Login from "./components/pages/Login";
-import Registration from "./components/pages/Registration";
-import NotFound from "./components/pages/NotFound";
-import "./App.css";
-import ArticleModal from "./components/ArticleService/ArticleModal";
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import LandingPage from './components/pages/LandingPage';
+import Login from './components/pages/Login';
+import Registration from './components/pages/Registration';
+import NotFound from './components/pages/NotFound';
+import './App.css';
+import ArticleModal from './components/ArticleService/ArticleModal';
 
 const Router = () => {
   return (
