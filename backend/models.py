@@ -1,6 +1,7 @@
 from uuid import uuid4
 from flask_sqlalchemy import SQLAlchemy
 import datetime
+from flask import session
 
 db = SQLAlchemy()
 
@@ -21,7 +22,9 @@ class Articles(db.Model):
     title = db.Column(db.String(100))
     body = db.Column(db.Text())
     date = db.Column(db.Date, default=datetime.datetime.now)
+    user_id = db.Column(db.String(32), db.ForeignKey('users.id'))
 
     def __init__(self, title, body):
         self.title = title
         self.body = body
+        self.user_id = session.get('user_id')

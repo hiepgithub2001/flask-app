@@ -43,6 +43,7 @@ def login_user():
         return jsonify({"error": "Password is not correct!"}), 401
 
     session['user_id'] = user.id
+    print(f'set session: {session.get("user_id")}')
 
     return jsonify({
         "status": "login successfully!"
@@ -52,6 +53,7 @@ def login_user():
 @app.route('/@me', methods=['GET'])
 def get_current_user():
     user_id = session.get('user_id')
+    print(f'user_id={user_id}')
 
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
@@ -59,3 +61,12 @@ def get_current_user():
     user = User.query.filter(User.id == user_id).first()
 
     return user_schema.dump(user)
+
+
+@app.route('/logout', methods=['POST'])
+def logout_user():
+    session.pop('user_id', None)
+
+    return jsonify({
+        "status": "logout successfully!"
+    })

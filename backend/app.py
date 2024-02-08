@@ -7,9 +7,9 @@ from flask_session import Session
 
 app = Flask(__name__)
 app.config.from_object(ApplicationConfig)
-CORS(app)
+CORS(app, supports_credentials=True)
 bcrypt = Bcrypt(app)
-server_session = Session(app)
+Session(app)
 
 db.init_app(app)
 

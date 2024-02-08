@@ -1,4 +1,4 @@
-from flask import jsonify, request, Blueprint
+from flask import jsonify, request, Blueprint, session
 from models import db, Articles
 from schema import ArticleSchema
 
@@ -10,7 +10,10 @@ article_schema = ArticleSchema()
 
 @app.route('/get', methods=['GET'])
 def get_articles():
-    records = Articles.query.all()
+    print(session.get('user_id'))
+    records = Articles.query.filter(
+        Articles.user_id == session.get('user_id')
+    ).all()
     articles = [dict(
         id=item.id,
         title=item.title,

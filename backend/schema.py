@@ -12,3 +12,4 @@ class ArticleSchema(Schema):
     title = fields.String(required=True)
     body = fields.String(required=True)
     date = fields.Date()
+    user_id = fields.String(dump_only=True)
