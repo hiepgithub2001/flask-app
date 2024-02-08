@@ -1,6 +1,6 @@
 export default class APIservice {
   static async GetArticle() {
-    const resp = await fetch(`http://127.0.0.1:5000/get`, {
+    const resp = await fetch(`/get`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -11,7 +11,7 @@ export default class APIservice {
   }
 
   static async UpdateArticle(id, body) {
-    const resp = await fetch(`http://127.0.0.1:5000/update/${id}`, {
+    const resp = await fetch(`/update/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -23,7 +23,7 @@ export default class APIservice {
   }
 
   static async AddArticle(body) {
-    const resp = await fetch(`http://127.0.0.1:5000/add`, {
+    const resp = await fetch(`/add`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -35,7 +35,7 @@ export default class APIservice {
   }
 
   static async DeleteArticle(id, body) {
-    const resp = await fetch(`http://127.0.0.1:5000/delete/${id}`, {
+    const resp = await fetch(`/delete/${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ export default class APIservice {
   }
 
   static async UserRegister(body) {
-    const resp = await fetch(`http://127.0.0.1:5000/register`, {
+    const resp = await fetch(`/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ export default class APIservice {
   }
 
   static async UserLogin(body) {
-    const resp = await fetch(`http://127.0.0.1:5000/login`, {
+    const resp = await fetch(`/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ export default class APIservice {
   }
 
   static async GetCurrentUser() {
-    const resp = await fetch(`http://127.0.0.1:5000/@me`, {
+    const resp = await fetch(`/@me`, {
       method: 'GET',
       credentials: 'include',
     });
@@ -79,7 +79,7 @@ export default class APIservice {
   }
 
   static async Logout() {
-    const resp = await fetch(`http://127.0.0.1:5000/logout`, {
+    const resp = await fetch(`/logout`, {
       method: 'POST',
       credentials: 'include',
     });

@@ -25,4 +25,4 @@ app.register_blueprint(user_app)
 app.register_blueprint(article_app)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
