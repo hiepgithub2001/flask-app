@@ -5,6 +5,7 @@ import Login from "./components/pages/Login";
 import Registration from "./components/pages/Registration";
 import NotFound from "./components/pages/NotFound";
 import "./App.css";
+import ArticleModal from "./components/ArticleService/ArticleModal";
 
 const Router = () => {
   return (
@@ -14,6 +15,7 @@ const Router = () => {
         <Route path="/login" exact element={<Login />} />
         <Route path="/register" exact element={<Registration />} />
         <Route path="/*" exact element={<NotFound />} />
+        <Route path="/article" exact element={<ArticleModal />} />
       </Routes>
     </BrowserRouter>
   );

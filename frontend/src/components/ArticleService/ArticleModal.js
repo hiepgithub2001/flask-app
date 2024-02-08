@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import ArticleList from './ArticleList';
 import Form from './Form';
 import APIservice from '../APIservice';
+import { Link } from 'react-router-dom';
 
 function ArticleModal() {
   const [articles, setArticles] = useState([]);
@@ -66,6 +67,9 @@ function ArticleModal() {
           <button className="btn btn-success" onClick={openForm}>
             Add Article
           </button>
+          <Link to="/" className="btn btn-light my-3 mx-5">
+            Go Home
+          </Link>
         </div>
       </div>
       <ArticleList

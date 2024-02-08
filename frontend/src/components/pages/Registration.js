@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "../../index.css";
 import "../../style.css";
 import { Link } from "react-router-dom";
+import APIservice from "../APIservice";
 
 const Registration = () => {
     const [email, setEmail] = useState("");
@@ -10,14 +11,8 @@ const Registration = () => {
     const User_Registration = async () => {
         console.log(email, password);
 
-        try {
-            await APIService.UserRegistration({ email, password });
-            window.location.href = "/";
-        } catch (error) {
-            if (error.response.status === 401) {
-                alert("invalied Credential");
-            }
-        }
+        await APIservice.UserRegister({ email, password });
+        window.location.href = "/";
     };
 
     return (

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import APIservice from "../APIservice";
+import { Link } from "react-router-dom";
+
 
 const LandingPage = () => {
-    const [user, setUser] = useState('');
+    const [user, setUser] = useState(null);
 
     const logoutUser = async () => {
-        await APIservice.UserLogout();
+        await APIservice.Logout();
         window.location.href = "/";
     };
 
@@ -14,7 +16,12 @@ const LandingPage = () => {
         (async () => {
             try {
                 await APIservice.GetCurrentUser()
-                .then((resp) => setUser(resp.id));
+                    .then((resp) => {
+                        if (resp.id) {
+                            setUser(resp);
+                        }
+                        console.log(resp);
+                    });
             } catch (error) {
                 console.log("Not authenticated");
             }
@@ -26,6 +33,9 @@ const LandingPage = () => {
             <hr></hr>
             {user != null ? (
                 <div>
+                    <Link to="/article" className="btn btn-danger my-3 mx-5">
+                        Article Service
+                    </Link>
                     <h2 className="centerText ">You are Successfully Logged in</h2>
                     <h4 className="centerText pt-4">ID: {user.id}</h4>
                     <h4 className="centerText pt-4">Email: {user.email}</h4>
@@ -42,7 +52,7 @@ const LandingPage = () => {
                 <div>
                     <h2 className="centerText">
                         <h4>
-                            <strong>you are not logged in</strong>
+                            <strong>You are not logged in</strong>
                         </h4>
                     </h2>
                     <Container>
@@ -50,7 +60,7 @@ const LandingPage = () => {
                             <Col md={{ span: 4, offset: 2 }}>
                                 <a href="/login">
                                     {" "}
-                                    <Button variant="outline-primary">login</Button>
+                                    <Button variant="outline-primary">Login</Button>
                                 </a>
                             </Col>
                             <Col md={3}>
