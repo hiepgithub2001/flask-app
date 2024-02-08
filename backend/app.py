@@ -1,72 +1,28 @@
-from flask import Flask, jsonify, request
+from flask import Flask
 from flask_cors import CORS
-from models import db, User, Articles
+from models import db
 from config import ApplicationConfig
-from schema import ArticleSchema
-
+from flask_bcrypt import Bcrypt
+from flask_session import Session
 
 app = Flask(__name__)
 app.config.from_object(ApplicationConfig)
 CORS(app)
+bcrypt = Bcrypt(app)
+server_session = Session(app)
 
 db.init_app(app)
 
 with app.app_context():
     db.create_all()
 
-
-article_schema = ArticleSchema()
-
-@app.route('/get', methods=['GET'])
-def get_articles():
-    records = Articles.query.all()
-    articles = [dict(
-        id=item.id,
-        title=item.title,
-        body=item.body,
-        date=item.date
-    ) for item in records]
-    return jsonify(articles)
-
-@app.route('/add', methods=['POST'])
-def add_articles():
-    title = request.json['title']
-    body = request.json['body']
-
-    articles = Articles(title, body)
-    db.session.add(articles)
-    db.session.commit()
-
-    return article_schema.dump(articles)
+# Import and register routes from user.py and article.py
+from API.user import app as user_app
+from API.article import app as article_app
 
 
-@app.route('/update/<id>', methods=['PUT'])
-def update_article(id):
-    article = Articles.query.get(id)
-
-    title = request.json['title']
-    body = request.json['body']
-
-    article.title = title
-    article.body = body
-
-    db.session.commit()
-    return article_schema.dump(article)
-
-
-@app.route('/delete/<id>', methods=['DELETE'])
-def delete_article(id):
-    article = Articles.query.get(id)
-
-    if not article:
-        return jsonify({
-            "Status": "The article is not exist!"
-        })
-
-    db.session.delete(article)
-    db.session.commit()
-    return article_schema.dump(article)    
-
+app.register_blueprint(user_app)
+app.register_blueprint(article_app)
 
 if __name__ == "__main__":
     app.run(debug=True)

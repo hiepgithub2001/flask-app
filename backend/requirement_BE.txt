@@ -6,3 +6,6 @@ marshmallow-sqlalchemy
 Flask-Cors
 python-dotenv
 marshmallow
+flask_bcrypt
+flask_session
+redis
