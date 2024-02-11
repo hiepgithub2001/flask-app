@@ -10,7 +10,6 @@ article_schema = ArticleSchema()
 
 @app.route('/get', methods=['GET'])
 def get_articles():
-    print(session.get('user_id'))
     records = Articles.query.filter(
         Articles.user_id == session.get('user_id')
     ).all()

@@ -34,6 +34,9 @@ const LandingPage = () => {
           <Link to="/article" className="btn btn-danger my-3 mx-5">
             Article Service
           </Link>
+          <Link to="/chatting" className="btn btn-danger my-3 mx-5">
+            Chatting Service
+          </Link>
           <h2 className="centerText ">You are Successfully Logged in</h2>
           <h4 className="centerText pt-4">ID: {user.id}</h4>
           <h4 className="centerText pt-4">Email: {user.email}</h4>
