@@ -10,7 +10,7 @@ function ChattingModal() {
 
     useEffect(() => {
         if (buttonStatus) {
-            const socket = io('http://127.0.0.1:5000/', {
+            let socket = io('http://127.0.0.1:5000/', {
                 transports: ['websocket'],
                 cors: {
                     origin: 'http://localhost:3000/'
@@ -43,11 +43,11 @@ function ChattingModal() {
             {buttonStatus ? (
                 <div>
                     <button onClick={() => setButtonStatus(false)}>Turn chat off </button>
-                    {!loading && (
+                    {/* {!loading && (
                         <RoomChatModal
                             socket={socketInstance}
                         />
-                    )}
+                    )} */}
                 </div>
             ) : (
                 <button onClick={() => setButtonStatus(true)}>Turn chat on </button>

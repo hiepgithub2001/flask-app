@@ -16,6 +16,7 @@ Session(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 db.init_app(app)
+socketio.init_app(app)
 
 with app.app_context():
     db.create_all()
