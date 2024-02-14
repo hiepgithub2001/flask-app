@@ -31,6 +31,11 @@ class RMQLogger:
         if len(self.log_buffer) >= 10:
             self.flush_buffer()
 
+    def error(self, e : Exception) :
+        logging.info(msg="Aadding error message = " + str(e))
+        self.log_buffer.append(str(e))
+        self.flush_buffer()
+
     def flush_buffer(self):
         if self.log_buffer:
             messages = '\n'.join(self.log_buffer)

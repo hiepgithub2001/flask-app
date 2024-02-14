@@ -1,5 +1,5 @@
+import importlib
 import torch
-import argparse
 from torchvision import datasets, transforms
 
 import torch.nn as nn
@@ -8,10 +8,17 @@ from torchvision import datasets, transforms
 from torch.optim.lr_scheduler import StepLR
 import torch.nn.functional as F
 
-import logging
-
-from model.net import YourModel as Net
 from service.logging.log import RMQLogger
+from service.training.hyper_parameter import HyperParameters
+
+def load_model_from_code(user_mode_code):
+    try:
+        spec = importlib.util.spec_from_loader("model", loader=None)
+        module = importlib.util.module_from_spec(spec)
+        exec(user_mode_code, module.__dict__)
+        return module.MNISTModel()
+    except Exception as e:
+        raise Exception(str(e))
 
 def train(args, model, device, train_loader, optimizer, epoch):
     model.train()
@@ -47,7 +54,36 @@ def test(model, device, test_loader):
         test_loss, correct, len(test_loader.dataset),
         100. * correct / len(test_loader.dataset)))
 
-def prepare(args):
+def start(args, user_code):
+    train_kwargs, test_kwargs, device = prepare_device_and_kwargs(args)
+
+    try:
+        model = load_model_from_code(user_code).to(device)
+
+        transform=transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.1307,), (0.3081,))
+            ])
+
+        train_dataset = datasets.MNIST('../data', train=True, download=True,
+                        transform=transform)
+        test_dataset = datasets.MNIST('../data', train=False,
+                        transform=transform)
+        
+        train_loader = torch.utils.data.DataLoader(train_dataset,**train_kwargs)
+        test_loader = torch.utils.data.DataLoader(test_dataset, **test_kwargs)
+        
+        optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
+
+        scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
+        for epoch in range(1, args.epochs + 1):
+            train(args, model, device, train_loader, optimizer, epoch)
+            test(model, device, test_loader)
+            scheduler.step()
+    except Exception as exception:
+        RMQLogger.getInstance().error(exception)
+
+def prepare_device_and_kwargs(args):
     train_kwargs = {'batch_size': args.batch_size}
     test_kwargs = {'batch_size': args.test_batch_size}
     
@@ -61,52 +97,18 @@ def prepare(args):
     else:
         device = torch.device("cpu")
 
-    model = Net().to(device)
-
     if use_cuda:
-        cuda_kwargs = {'num_workers': 1,
-                       'pin_memory': True,
-                       'shuffle': True}
-        train_kwargs.update(cuda_kwargs)
-        test_kwargs.update(cuda_kwargs)
+            cuda_kwargs = {'num_workers': 1,
+                        'pin_memory': True,
+                        'shuffle': True}
+            train_kwargs.update(cuda_kwargs)
+            test_kwargs.update(cuda_kwargs)
+    return train_kwargs,test_kwargs,device
 
-    transform=transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.1307,), (0.3081,))
-        ])
-    dataset1 = datasets.MNIST('../data', train=True, download=True,
-                       transform=transform)
-    dataset2 = datasets.MNIST('../data', train=False,
-                       transform=transform)
-    
-    train_loader = torch.utils.data.DataLoader(dataset1,**train_kwargs)
-    test_loader = torch.utils.data.DataLoader(dataset2, **test_kwargs)
-    
-    optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
 
-    scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
-    for epoch in range(1, args.epochs + 1):
-        train(args, model, device, train_loader, optimizer, epoch)
-        test(model, device, test_loader)
-        scheduler.step()
-
-class HyperParameters:
-    def __init__(self, batch_size=64, test_batch_size=100, epochs=10, lr=0.01, gamma=0.5, no_cuda=False, no_mps=False, seed=1, log_interval=10, save_model=False, dry_run=False):
-        self.batch_size = batch_size
-        self.test_batch_size = test_batch_size
-        self.epochs = epochs
-        self.lr = lr
-        self.gamma = gamma
-        self.no_cuda = no_cuda
-        self.no_mps = no_mps
-        self.seed = seed
-        self.log_interval = log_interval
-        self.save_model = save_model
-        self.dry_run = dry_run
-
-def train_model():
+def train_model(user_code):
     args = HyperParameters(
         batch_size=64,
         test_batch_size=1000,
     )
-    prepare(args)
+    start(args, user_code)

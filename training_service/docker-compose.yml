@@ -1,6 +1,18 @@
 version: '3'
 
 services:
+  database:
+    image: postgres:latest
+    container_name: database
+    environment:
+      POSTGRES_DB: my_database
+      POSTGRES_USER: my_user
+      POSTGRES_PASSWORD: my_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./database:/var/lib/postgresql/data
+
   rabbitmq:
     image: rabbitmq:3-management
     ports:
