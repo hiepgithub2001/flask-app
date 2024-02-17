@@ -1,9 +1,11 @@
+import json
 import pika
 from dotenv import load_dotenv
 import os
 import logging
+from dto.training_job_dto import SubmitTrainingJob
 
-from service.training.trainer import train_model
+from service.training.trainer import Trainer
 from service.logging.log import RMQLogger
 
 load_dotenv()
@@ -34,8 +36,16 @@ channel.queue_bind(
 
 print(' [*] Waiting for logs. To exit press CTRL+C')
 def callback(ch, method, properties, body):
-    user_submitted_code = body
-    train_model(user_submitted_code)
+    json_data = json.loads(body)
+    training_data = SubmitTrainingJob.model_validate(json_data)
+
+    trainer = Trainer(
+        training_data.paramter_id, 
+        training_data.user_decoded_code, 
+        training_data.paramter
+    )
+
+    trainer.train_model()
 
 channel.basic_consume(
     queue=queue_name, 

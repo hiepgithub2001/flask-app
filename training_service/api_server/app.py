@@ -1,47 +1,57 @@
 import base64
+
 from flask import Flask, request, jsonify
-import pika
+from config.message_queue import RabbitMQPublisher
+
+from model.model import db
+from config.database import DATABASE_URL
+
+from service.job_service import JobService
+from repositories.model_repo import MLModelRepository
+from repositories.parameter_repo import HyperParameterRepository
+
 from dto.submit_training_job_request import SubmitTrainingJob
-import pika
-from dotenv import load_dotenv
-import os
+from dto.submit_parameter_req import SubmitParamter
+
 import logging
 
 app = Flask(__name__)
-
-load_dotenv()
-TRAINING_TOPIC = os.getenv("TRAINING_KEY")
-TRAINING_JOB_KEY = os.getenv("TRAINING_JOB_KEY")
-MQ_HOST = os.getenv("MQ_HOST")
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 
 logging.basicConfig(level=logging.INFO)
 
+def init_mq_publisher():
+    return RabbitMQPublisher()
 
-RABBITMQ_HOST = 'localhost'
-RABBITMQ_QUEUE = 'user_code_queue'
-
-def publish_to_rabbitmq(user_code: str):
-    connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host=MQ_HOST))
-    channel = connection.channel()
-
-    channel.basic_publish(exchange=TRAINING_TOPIC,
-                        routing_key=TRAINING_JOB_KEY,
-                        body=user_code)
-    connection.close()
+def init_database():
+    db.init_app(app)
 
 @app.route('/submit_code', methods=['POST'])
 def submit_code():
     try:
         request_data = SubmitTrainingJob.model_validate(request.json)
 
-        user_code = base64.b64decode(request_data.user_code_encoded).decode()
-        publish_to_rabbitmq(user_code)
+        user_decoded_code = base64.b64decode(request_data.user_code_encoded).decode()
+        hyper_param = request_data.hyper_parameter
+
+        job_service.submit_job(user_decoded_code, hyper_param)
 
         return jsonify({'message': 'User code submitted successfully'}), 200
     except Exception as e:
+        print(e)
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    # Run the Flask application
+    init_database()
+    mq_publiser = init_mq_publisher()
+
+    param_repo = HyperParameterRepository(db)
+    job_repo = MLModelRepository(db)
+
+    job_service = JobService(
+        job_repo=job_repo, 
+        param_repo=param_repo, 
+        mq_publisher=mq_publiser
+    )
+
     app.run(debug=True)

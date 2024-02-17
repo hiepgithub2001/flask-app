@@ -1,5 +1,7 @@
 import pika
 import logging
+import json
+
 
 class RMQLogger:
     _instance = None
@@ -10,7 +12,8 @@ class RMQLogger:
             cls._instance.connection = connection
             cls._instance.channel = channel
             cls._instance.queue_name = queue_name
-            cls._instance.log_buffer = []
+            cls._instance.log_stack = {}
+            cls._instance.log_batch_index = {}
         return cls._instance
 
     @staticmethod
@@ -25,24 +28,52 @@ class RMQLogger:
             raise Exception("Require to call createInstance before use")
         return RMQLogger._instance
 
-    def log(self, message: str):
-        logging.info(msg="Adding log message = " + message)
-        self.log_buffer.append(message)
-        if len(self.log_buffer) >= 10:
-            self.flush_buffer()
+    def log(self, id : str, message: str):
+        logging.info(msg=f'[parameter_id {id}] ' + message)
+        if (self.log_stack.get(id) is None) :
+            self.log_stack[id] = []
 
-    def error(self, e : Exception) :
-        logging.info(msg="Aadding error message = " + str(e))
-        self.log_buffer.append(str(e))
+        self.log_stack[id].append(message)
+
+        if len(self.log_stack[id]) >= 10:
+            self.flush_buffer(id)
+
+    def error(self,id : str, e : Exception) :
+        logging.info(msg=f'[parameter_id {id}] ' + str(e))
+
+        if (self.log_stack.get(id) is None) :
+            self.log_stack[id] = []
+
+        self.log_stack[id].append(str(e))
         self.flush_buffer()
 
-    def flush_buffer(self):
-        if self.log_buffer:
-            messages = '\n'.join(self.log_buffer)
+    def flush_buffer(self, id):
+        if self.log_stack:
+            log_content = '\n'.join(self.log_stack[id])
+            log_batch_index = self.get_batch_index(id)
+            message = {
+                'id' : id,
+                'content' : log_content,
+                'batch' : log_batch_index
+            }
             self.channel.basic_publish(
                 exchange='training', 
                 routing_key=self.queue_name, 
-                body=messages
+                body=json.dumps(message)
             )
-            logging.info("Logs published to RabbitMQ")
-            self.log_buffer.clear()
+            logging.info(f'Logs parameter_id {id} published to RabbitMQ')
+            self.log_stack[id].clear()
+            self.update_batch_index(id)
+    
+    def get_batch_index(self, id):
+        if self.log_batch_index.get(id) is None:
+            self.log_batch_index[id] = 0;
+            return 0
+        else:
+            return self.log_batch_index.get(id)
+        
+    def update_batch_index(self, id):
+        if self.log_batch_index.get(id) is None:
+            self.log_batch_index[id] = 0;
+        
+        self.log_batch_index[id] += 1
