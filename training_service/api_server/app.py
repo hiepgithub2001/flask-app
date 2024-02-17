@@ -25,6 +25,8 @@ def init_mq_publisher():
 
 def init_database():
     db.init_app(app)
+    with app.app_context():
+        db.create_all()
 
 @app.route('/submit_code', methods=['POST'])
 def submit_code():
@@ -42,7 +44,9 @@ def submit_code():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
+    app.run(debug=True)
     init_database()
+
     mq_publiser = init_mq_publisher()
 
     param_repo = HyperParameterRepository(db)
@@ -53,5 +57,3 @@ if __name__ == '__main__':
         param_repo=param_repo, 
         mq_publisher=mq_publiser
     )
-
-    app.run(debug=True)

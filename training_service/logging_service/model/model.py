@@ -1,8 +1,10 @@
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Float, ForeignKey, Integer, String, Enum
 from sqlalchemy.orm import relationship
-from model.base import Base
 
-class MLModel(Base):
+db = SQLAlchemy()
+
+class MLModel(db.Model):
     __tablename__ = 'ml_model'
     id = Column(Integer, primary_key=True)
 
@@ -11,7 +13,7 @@ class MLModel(Base):
 
     parameters = relationship('HyperParameter', backref='model')
 
-class HyperParameter(Base):
+class HyperParameter(db.Model):
     __tablename__ = 'parameter'
     id = Column(Integer, primary_key=True)
     model_id = Column(Integer,  ForeignKey('ml_model.id'))
@@ -26,7 +28,7 @@ class HyperParameter(Base):
     logs = relationship("JobLogging", backref="parameter")
 
 
-class JobLogging(Base):
+class JobLogging(db.Model):
     __tablename__ = 'job_logging'
     id = Column(Integer, primary_key=True)
     parameter_id = Column(Integer,  ForeignKey('parameter.id'))
@@ -34,7 +36,7 @@ class JobLogging(Base):
     batching = Column(Integer)
     content = Column(String)
 
-class JobResult(Base):
+class JobResult(db.Model):
     __tablename__ = 'job_result'
     id = Column(Integer, primary_key=True)
     parameter_id = Column(Integer,  ForeignKey('parameter.id'))
@@ -44,7 +46,7 @@ class JobResult(Base):
     precision = Column(Float)
     logarithmic_loss = Column(Float)
 
-class JobStatus(Base):
+class JobStatus(db.Model):
     __tablename__ = 'job_status'
     id = Column(Integer, primary_key=True)
     parameter_id = Column(Integer,  ForeignKey('parameter.id'))
@@ -52,6 +54,6 @@ class JobStatus(Base):
     status = Column(Enum('loading', 'training', 'evaluating', 'done', name="status_enum"))
     current_epoch = Column(Integer)
     progress = Column(Integer)
-    loss = Column(Integer)
+    loss = Column(Float)
 
 

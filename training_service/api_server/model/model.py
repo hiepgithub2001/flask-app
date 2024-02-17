@@ -55,6 +55,6 @@ class JobStatus(db.Model):
     status = Column(Enum('loading', 'training', 'evaluating', 'done', name="status_enum"))
     current_epoch = Column(Integer)
     progress = Column(Integer)
-    loss = Column(Integer)
+    loss = Column(Float)
 
 
